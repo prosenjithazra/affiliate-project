@@ -65,6 +65,7 @@ const fallbackProducts = [
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [settings, setSettings] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"featured" | "trending" | "deals">("featured");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -79,10 +80,14 @@ export default function HomePage() {
       fetch("/api/categories")
         .then((res) => (res.ok ? res.json() : []))
         .catch(() => fallbackCategories),
+      fetch("/api/settings")
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
     ])
-      .then(([productsData, categoriesData]) => {
+      .then(([productsData, categoriesData, settingsData]) => {
         setProducts(productsData.length ? productsData : fallbackProducts);
         setCategories(categoriesData.length ? categoriesData : fallbackCategories);
+        setSettings(settingsData);
       })
       .catch(() => {
         setProducts(fallbackProducts);
@@ -104,6 +109,34 @@ export default function HomePage() {
   const featured = products.filter((p) => p.featured);
   const trending = products.filter((p) => p.trending);
   const deals = products.filter((p) => p.topDeal || (p.oldPrice && p.oldPrice > p.price));
+
+  const promo1 = settings?.homepagePromos?.promo1 || {
+    title: "Dinamic Tracking",
+    desc: "Artisanal rugs, wallpaper, classic vases, and lighting accessories—well-made and carefully considered—whether made by Heath or by like-minded makers we admire. Welcome in.",
+    img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
+    link: "/search"
+  };
+
+  const promo2 = settings?.homepagePromos?.promo2 || {
+    title: "Audio Speaker A1",
+    desc: "Lasted answer oppose to ye months no esteem. Branched is on an ecstatic directly it.",
+    img: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800",
+    link: "/search"
+  };
+
+  const promo3 = settings?.homepagePromos?.promo3 || {
+    title: "Headphone",
+    desc: "Headphones give you a great experience. Verified ratings and specs.",
+    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+    link: "/search"
+  };
+
+  const promo4 = settings?.homepagePromos?.promo4 || {
+    title: "Smart Watch",
+    desc: "It is a long established fact that a reader will. Aggregated specs and direct links.",
+    img: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800",
+    link: "/search"
+  };
 
   const tabItems = {
     featured: featured.slice(0, 8),
@@ -224,18 +257,18 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm">
           <div className="overflow-hidden rounded-xl aspect-[4/3] bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
             <img
-              src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800"
-              alt="iMac Workstation"
+              src={promo1.img || "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800"}
+              alt={promo1.title}
               className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-500"
             />
           </div>
           <div className="text-center space-y-4 px-2">
-            <h3 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">Dinamic Tracking</h3>
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">{promo1.title}</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
-              Artisanal rugs, wallpaper, classic vases, and lighting accessories—well-made and carefully considered—whether made by Heath or by like-minded makers we admire. Welcome in.
+              {promo1.desc}
             </p>
             <Link
-              href="/search"
+              href={promo1.link || "/search"}
               className="inline-block text-xs font-black uppercase tracking-widest text-slate-800 dark:text-white border-b-2 border-slate-800 dark:border-white pb-0.5 hover:text-primary hover:border-primary transition-colors"
             >
               SHOP NOW
@@ -243,8 +276,8 @@ export default function HomePage() {
           </div>
           <div className="overflow-hidden rounded-xl aspect-[4/3] bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
             <img
-              src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800"
-              alt="Headphones Setup"
+              src={promo1.img || "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=800"}
+              alt={promo1.title}
               className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-500"
             />
           </div>
@@ -259,18 +292,18 @@ export default function HomePage() {
           <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-2xl p-6 sm:p-8 flex flex-col justify-between items-center text-center shadow-sm group">
             <div className="overflow-hidden rounded-xl w-full max-h-[300px] flex justify-center bg-slate-50 dark:bg-slate-950 p-4">
               <img
-                src="https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800"
-                alt="Audio Speaker A1"
+                src={promo2.img || "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800"}
+                alt={promo2.title}
                 className="max-h-[260px] w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
               />
             </div>
             <div className="mt-6 space-y-3">
-              <h3 className="text-xl font-black text-slate-800 dark:text-white">Audio Speaker A1</h3>
+              <h3 className="text-xl font-black text-slate-800 dark:text-white">{promo2.title}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">
-                Lasted answer oppose to ye months no esteem. Branched is on an ecstatic directly it.
+                {promo2.desc}
               </p>
               <Link
-                href="/search"
+                href={promo2.link || "/search"}
                 className="inline-block text-xs font-black uppercase tracking-widest text-slate-800 dark:text-white border-b-2 border-slate-800 dark:border-white pb-0.5 hover:text-primary hover:border-primary transition-colors"
               >
                 SHOP NOW
@@ -285,18 +318,18 @@ export default function HomePage() {
             <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6 shadow-sm group flex-1">
               <div className="w-full sm:w-1/2 overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-950 p-3 flex justify-center h-full items-center">
                 <img
-                  src="https://images.unsplash.com/photo-1496181130204-755241524eab?w=800"
-                  alt="Headphone"
+                  src={promo3.img || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800"}
+                  alt={promo3.title}
                   className="max-h-[140px] w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
                 />
               </div>
               <div className="w-full sm:w-1/2 space-y-2">
-                <h3 className="text-lg font-black text-slate-800 dark:text-white">Headphone</h3>
+                <h3 className="text-lg font-black text-slate-800 dark:text-white">{promo3.title}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Headphones give you a great experience. Verified ratings and specs.
+                  {promo3.desc}
                 </p>
                 <Link
-                  href="/search"
+                  href={promo3.link || "/search"}
                   className="inline-block text-xs font-black uppercase tracking-widest text-slate-800 dark:text-white border-b-2 border-slate-800 dark:border-white pb-0.5 hover:text-primary hover:border-primary transition-colors"
                 >
                   SHOP NOW
@@ -307,12 +340,12 @@ export default function HomePage() {
             {/* Bottom stacked item */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6 shadow-sm group flex-1">
               <div className="w-full sm:w-1/2 space-y-2 order-2 sm:order-1">
-                <h3 className="text-lg font-black text-slate-800 dark:text-white">Smart Watch</h3>
+                <h3 className="text-lg font-black text-slate-800 dark:text-white">{promo4.title}</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  It is a long established fact that a reader will. Aggregated specs and direct links.
+                  {promo4.desc}
                 </p>
                 <Link
-                  href="/search"
+                  href={promo4.link || "/search"}
                   className="inline-block text-xs font-black uppercase tracking-widest text-slate-800 dark:text-white border-b-2 border-slate-800 dark:border-white pb-0.5 hover:text-primary hover:border-primary transition-colors"
                 >
                   SHOP NOW
@@ -320,8 +353,8 @@ export default function HomePage() {
               </div>
               <div className="w-full sm:w-1/2 overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-950 p-3 flex justify-center h-full items-center order-1 sm:order-2">
                 <img
-                  src="https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800"
-                  alt="Smart Watch"
+                  src={promo4.img || "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800"}
+                  alt={promo4.title}
                   className="max-h-[140px] w-auto object-contain group-hover:scale-[1.03] transition-transform duration-500"
                 />
               </div>

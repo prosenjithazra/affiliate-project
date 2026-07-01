@@ -18,6 +18,7 @@ import {
   Sun,
   Moon,
   Laptop,
+  LayoutGrid,
 } from "lucide-react";
 import { Button } from "@repo/ui";
 
@@ -53,6 +54,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       name: "Brands",
       href: "/admin/brands",
       icon: <Bookmark className="h-5 w-5" />,
+    },
+    {
+      name: "Homepage Promos",
+      href: "/admin/homepage",
+      icon: <LayoutGrid className="h-5 w-5" />,
     },
     {
       name: "Blogs & Guides",

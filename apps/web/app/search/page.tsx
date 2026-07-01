@@ -40,11 +40,35 @@ async function getSearchData(params: {
     }
 
     if (params.categoryId) {
-      whereClause.categoryId = params.categoryId;
+      const category = await prisma.category.findFirst({
+        where: {
+          OR: [
+            { id: params.categoryId },
+            { slug: params.categoryId }
+          ]
+        }
+      });
+      if (category) {
+        whereClause.categoryId = category.id;
+      } else {
+        whereClause.categoryId = params.categoryId;
+      }
     }
 
     if (params.brandId) {
-      whereClause.brandId = params.brandId;
+      const brand = await prisma.brand.findFirst({
+        where: {
+          OR: [
+            { id: params.brandId },
+            { slug: params.brandId }
+          ]
+        }
+      });
+      if (brand) {
+        whereClause.brandId = brand.id;
+      } else {
+        whereClause.brandId = params.brandId;
+      }
     }
 
     if (params.topDeal === "true") {
@@ -113,11 +137,23 @@ async function getSearchData(params: {
     }
 
     if (params.categoryId) {
-      filtered = filtered.filter((p) => p.categoryId === params.categoryId);
+      const catId = params.categoryId;
+      filtered = filtered.filter(
+        (p) =>
+          p.categoryId === catId ||
+          p.category?.slug === catId ||
+          p.category?.name.toLowerCase() === catId.toLowerCase()
+      );
     }
 
     if (params.brandId) {
-      filtered = filtered.filter((p) => p.brandId === params.brandId);
+      const bId = params.brandId;
+      filtered = filtered.filter(
+        (p) =>
+          p.brandId === bId ||
+          p.brand?.slug === bId ||
+          p.brand?.name.toLowerCase() === bId.toLowerCase()
+      );
     }
 
     if (params.topDeal === "true") {

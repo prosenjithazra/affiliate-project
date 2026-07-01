@@ -313,6 +313,32 @@ export const mockSettings: Settings = {
     twitter: "https://twitter.com/affiliatehub",
     facebook: "https://facebook.com/affiliatehub",
   },
+  homepagePromos: {
+    promo1: {
+      title: "Dinamic Tracking",
+      desc: "Artisanal rugs, wallpaper, classic vases, and lighting accessories—well-made and carefully considered—whether made by Heath or by like-minded makers we admire. Welcome in.",
+      img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
+      link: "/search"
+    },
+    promo2: {
+      title: "Audio Speaker A1",
+      desc: "Lasted answer oppose to ye months no esteem. Branched is on an ecstatic directly it.",
+      img: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800",
+      link: "/search"
+    },
+    promo3: {
+      title: "Headphone",
+      desc: "Headphones give you a great experience. Verified ratings and specs.",
+      img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+      link: "/search"
+    },
+    promo4: {
+      title: "Smart Watch",
+      desc: "It is a long established fact that a reader will. Aggregated specs and direct links.",
+      img: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800",
+      link: "/search"
+    }
+  },
   footerText: "© 2026 AffiliateHub. Outbound links may earn us a small commission.",
   contactEmail: "hello@affiliatehub.com",
   googleAnalyticsId: "UA-MOCK",

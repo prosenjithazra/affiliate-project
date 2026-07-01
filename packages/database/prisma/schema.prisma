@@ -108,6 +108,7 @@ model Settings {
   seoTitle          String?
   seoDescription    String?
   socialLinks       Json     // e.g. { "twitter": "", "facebook": "" }
+  homepagePromos    Json?    // e.g. { "promo1": {...}, "promo2": {...} }
   footerText        String?
   contactEmail      String?
   googleAnalyticsId String?

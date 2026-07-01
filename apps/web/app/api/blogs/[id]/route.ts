@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@repo/database";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
-import { mockBlogPosts } from "../route";
+import { mockBlogPosts } from "../mockData";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +47,7 @@ export async function PUT(
       return NextResponse.json(post);
     } catch (dbError) {
       console.warn("Database failed to update blog post. Updating mock instead.", dbError);
-      const index = mockBlogPosts.findIndex((b) => b.id === id);
+      const index = mockBlogPosts.findIndex((b: any) => b.id === id);
       if (index !== -1) {
         mockBlogPosts[index] = {
           ...mockBlogPosts[index]!,
@@ -89,7 +89,7 @@ export async function DELETE(
       return NextResponse.json({ success: true });
     } catch (dbError) {
       console.warn("Database failed to delete blog post. Deleting mock instead.", dbError);
-      const index = mockBlogPosts.findIndex((b) => b.id === id);
+      const index = mockBlogPosts.findIndex((b: any) => b.id === id);
       if (index !== -1) {
         mockBlogPosts.splice(index, 1);
         return NextResponse.json({ success: true });

@@ -94,6 +94,7 @@ export interface Settings {
   seoTitle?: string | null;
   seoDescription?: string | null;
   socialLinks: Record<string, string>; // e.g. { twitter: '...', facebook: '...' }
+  homepagePromos?: any; // e.g. promo configs
   footerText?: string | null;
   contactEmail?: string | null;
   googleAnalyticsId?: string | null;

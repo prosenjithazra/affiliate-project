@@ -11,20 +11,52 @@ const SETTINGS_ID = "site-settings";
 // GET /api/settings
 export async function GET() {
   try {
-    const settings = await prisma.settings.findUnique({
+    let settings = await prisma.settings.findUnique({
       where: { id: SETTINGS_ID },
     });
 
+    const defaultPromos = {
+      promo1: {
+        title: "Dinamic Tracking",
+        desc: "Artisanal rugs, wallpaper, classic vases, and lighting accessories—well-made and carefully considered—whether made by Heath or by like-minded makers we admire. Welcome in.",
+        img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
+        link: "/search"
+      },
+      promo2: {
+        title: "Audio Speaker A1",
+        desc: "Lasted answer oppose to ye months no esteem. Branched is on an ecstatic directly it.",
+        img: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800",
+        link: "/search"
+      },
+      promo3: {
+        title: "Headphone",
+        desc: "Headphones give you a great experience. Verified ratings and specs.",
+        img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+        link: "/search"
+      },
+      promo4: {
+        title: "Smart Watch",
+        desc: "It is a long established fact that a reader will. Aggregated specs and direct links.",
+        img: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800",
+        link: "/search"
+      }
+    };
+
     if (!settings) {
       // Create default settings if not exists
-      const defaultSettings = await prisma.settings.create({
+      settings = await prisma.settings.create({
         data: {
           id: SETTINGS_ID,
-          websiteName: "AffiliateHub",
+          websiteName: "ShopZone",
           socialLinks: {},
-        },
+          homepagePromos: defaultPromos,
+        } as any,
       });
-      return NextResponse.json(defaultSettings);
+    } else if (!(settings as any).homepagePromos) {
+      settings = {
+        ...settings,
+        homepagePromos: defaultPromos,
+      } as any;
     }
 
     return NextResponse.json(settings);
@@ -49,6 +81,7 @@ export async function PUT(req: NextRequest) {
       seoTitle,
       seoDescription,
       socialLinks,
+      homepagePromos,
       footerText,
       contactEmail,
       googleAnalyticsId,
@@ -63,10 +96,11 @@ export async function PUT(req: NextRequest) {
           seoTitle,
           seoDescription,
           socialLinks: socialLinks || {},
+          homepagePromos: homepagePromos || null,
           footerText,
           contactEmail,
           googleAnalyticsId,
-        },
+        } as any,
       });
       return NextResponse.json(settings);
     } catch (dbError) {
@@ -76,6 +110,7 @@ export async function PUT(req: NextRequest) {
       mockSettings.seoTitle = seoTitle ?? mockSettings.seoTitle;
       mockSettings.seoDescription = seoDescription ?? mockSettings.seoDescription;
       mockSettings.socialLinks = socialLinks ?? mockSettings.socialLinks;
+      mockSettings.homepagePromos = homepagePromos ?? mockSettings.homepagePromos;
       mockSettings.footerText = footerText ?? mockSettings.footerText;
       mockSettings.contactEmail = contactEmail ?? mockSettings.contactEmail;
       mockSettings.googleAnalyticsId = googleAnalyticsId ?? mockSettings.googleAnalyticsId;
