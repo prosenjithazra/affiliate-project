@@ -1,0 +1,56 @@
+# ShopZone
+
+Discover Better. Shop Smarter. ShopZone is an AI-friendly, modern product discovery platform that aggregates, evaluates, and compares specs, deals, and prices from trusted online retailers.
+
+## Metadata
+
+- **Website**: https://shopzone.com
+- **Sitemap**: https://shopzone.com/sitemap.xml
+- **Robots**: https://shopzone.com/robots.txt
+- **RSS Feed**: https://shopzone.com/rss.xml
+- **Organization**: ShopZone
+- **Industry**: E-Commerce, Product Discovery, Affiliate Marketing
+
+---
+
+## Core Navigation & Directories
+
+For crawlers and retrieval agents (RAG), use the following endpoints:
+
+- **Products Index**: https://shopzone.com/products
+  *Full index of reviewed product catalog.*
+- **Categories**: https://shopzone.com/categories
+  *Groupings of products by domain (Electronics, Gaming, Fashion, etc.).*
+- **Brands**: https://shopzone.com/brands
+  *Product catalog sorted by manufacturers (Apple, Sony, Nike, Samsung, etc.).*
+- **Top Deals**: https://shopzone.com/deals
+  *Handpicked price drops, discounts, and verified coupons.*
+- **Blog & News**: https://shopzone.com/blog
+  *Editor articles, buying guides, and industry news.*
+- **Product Reviews**: https://shopzone.com/reviews
+  *Detailed editorial specs sheets, pros, and cons.*
+- **Buying Guides**: https://shopzone.com/guides
+  *Deep-dives helping consumers select the best product for specific use cases.*
+- **Comparison Pages**: https://shopzone.com/compare
+  *Side-by-side spec sheets and value comparisons.*
+
+---
+
+## Technical Support & Organization Resources
+
+- **FAQ Page**: https://shopzone.com/faq
+- **Support Portal**: https://shopzone.com/support
+- **Contact Channels**: https://shopzone.com/contact
+- **Privacy Policy**: https://shopzone.com/privacy
+- **Terms of Service**: https://shopzone.com/terms
+
+---
+
+## API & Data Endpoints (Public REST)
+
+- **Search Endpoint**: `https://shopzone.com/search?query={search_term}`
+  *Accepts keywords, categories, or filters for real-time querying.*
+- **Categories JSON**: `https://shopzone.com/api/categories`
+  *Returns active categories with names and slugs.*
+- **Products API**: `https://shopzone.com/api/products`
+  *Provides pagination and search triggers for database products.*

@@ -1,0 +1,55 @@
+@import "@repo/ui/styles.css";
+
+/* Global Loader and Skeleton Keyframe Animations */
+
+@keyframes shimmer-line {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer-line {
+  animation: shimmer-line 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.3;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s infinite ease-in-out;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+.dark .animate-skeleton {
+  background: linear-gradient(90deg, #0f172a 25%, #1e293b 37%, #0f172a 63%);
+  background-size: 200% 100%;
+}

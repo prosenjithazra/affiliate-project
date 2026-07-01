@@ -1,0 +1,130 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../../../node_modules/.prisma/client"
+  binaryTargets = ["native", "darwin", "darwin-arm64"]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String
+  image       String
+  icon        String
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Brand {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  logo        String
+  description String
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id               String           @id @default(uuid())
+  name             String
+  slug             String           @unique
+  shortDescription String
+  fullDescription  String
+  price            Float
+  oldPrice         Float?
+  discount         Int?
+  rating           Float            @default(0)
+  affiliateStore   String
+  affiliateUrl     String
+  features         String[]
+  specifications   Json             // Key-value pairs
+  pros             String[]
+  cons             String[]
+  tags             String[]
+  stockStatus      String           @default("IN_STOCK") // "IN_STOCK", "OUT_OF_STOCK"
+  featured         Boolean          @default(false)
+  trending         Boolean          @default(false)
+  topDeal          Boolean          @default(false)
+  metaTitle        String?
+  metaDescription  String?
+  categoryId       String
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  brandId          String
+  brand            Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  images           ProductImage[]
+  clicks           AffiliateClick[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  url       String
+  order     Int      @default(0)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AffiliateClick {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  referrer  String?
+  userAgent String?
+  ip        String?
+  clickedAt DateTime @default(now())
+}
+
+model Settings {
+  id                String   @id @default("site-settings")
+  websiteName       String   @default("AffiliateHub")
+  logo              String?
+  seoTitle          String?
+  seoDescription    String?
+  socialLinks       Json     // e.g. { "twitter": "", "facebook": "" }
+  footerText        String?
+  contactEmail      String?
+  googleAnalyticsId String?
+  updatedAt         DateTime @updatedAt
+}
+
+model BlogPost {
+  id              String   @id @default(uuid())
+  title           String
+  slug            String   @unique
+  content         String   @db.Text
+  excerpt         String
+  coverImage      String?
+  metaTitle       String?
+  metaDescription String?
+  published       Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+

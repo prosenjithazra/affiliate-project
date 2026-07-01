@@ -1,0 +1,47 @@
+/* TEAM */
+
+Project
+ShopZone
+
+Description
+Modern Product Discovery Platform
+
+Frontend
+Next.js 15
+TypeScript
+Tailwind CSS
+shadcn/ui
+
+Backend
+Next.js
+Prisma
+PostgreSQL
+
+Developer
+ShopZone Team
+
+Website
+https://shopzone.com
+
+Email
+hello@shopzone.com
+
+Location
+India
+
+/* SITE */
+
+Launch
+2026
+
+Language
+English
+
+Framework
+Next.js
+
+Hosting
+Vercel
+
+Database
+PostgreSQL

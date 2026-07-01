@@ -1,0 +1,175 @@
+# ==============================================================================
+# ShopZone robots.txt
+# Dedicated Search Crawler & AI Bot Access Policy Rules
+# Reference: https://shopzone.com
+# ==============================================================================
+
+# Global Default Access Rules
+User-agent: *
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/private/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# Google Search Crawlers
+User-agent: Googlebot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /_next/image*
+Allow: /logoMainNew.png
+Allow: /logoMain.png
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /blog/
+Allow: /reviews/
+Allow: /
+
+# Microsoft Bing Crawlers
+User-agent: Bingbot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# Yahoo Crawler
+User-agent: Slurp
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# DuckDuckGo Crawler
+User-agent: DuckDuckBot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# Apple Search Assistant
+User-agent: Applebot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# OpenAI AI agents & search models
+User-agent: GPTBot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+User-agent: OAI-SearchBot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# Anthropic Claude Crawler
+User-agent: ClaudeBot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# Perplexity Engine Crawler
+User-agent: PerplexityBot
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /private/
+Allow: /products/
+Allow: /categories/
+Allow: /brands/
+Allow: /blog/
+Allow: /deals/
+Allow: /reviews/
+Allow: /
+
+# Social Share Snippet Fetchers (OpenGraph parsers)
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: Pinterestbot
+Allow: /
+
+# Sitemap Pointer
+Sitemap: https://shopzone.com/sitemap.xml
+
+# Canonical Host
+Host: https://shopzone.com
