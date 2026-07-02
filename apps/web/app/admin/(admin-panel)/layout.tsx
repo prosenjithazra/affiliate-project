@@ -17,7 +17,6 @@ import {
   X,
   Sun,
   Moon,
-  Laptop,
   LayoutGrid,
 } from "lucide-react";
 import { Button } from "@repo/ui";

@@ -38,23 +38,23 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchProducts = async () => {
+  const fetchProducts = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/products");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setProducts(data);
-    } catch (err: any) {
+    } catch {
       toastError("Could not retrieve products list. Showing memory fallback.", "Fetch Failed");
     } finally {
       setLoading(false);
     }
-  };
+  }, [toastError]);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   const handleDuplicate = async (product: Product) => {
     try {
@@ -123,7 +123,7 @@ export default function ProductsPage() {
       } else {
         throw new Error("Failed to update flag");
       }
-    } catch (err: any) {
+    } catch {
       toastError("Could not update product flag.", "Error");
     }
   };

@@ -31,7 +31,6 @@ import {
   BarChart,
   Bar,
   Cell,
-  Legend,
 } from "recharts";
 
 interface AnalyticsData {
@@ -50,7 +49,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/analytics");
@@ -59,16 +58,16 @@ export default function DashboardPage() {
       } else {
         throw new Error("Failed to load");
       }
-    } catch (err) {
+    } catch {
       toastError("Could not retrieve analytics metrics.", "Error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [toastError]);
 
   useEffect(() => {
     fetchAnalytics();
-  }, []);
+  }, [fetchAnalytics]);
 
   const COLORS = ["#1E40AF", "#F97316", "#1D4ED8", "#EA580C", "#64748B"];
 
@@ -243,7 +242,7 @@ export default function DashboardPage() {
         <CardContent>
           {topStores.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-              {topStores.map((store, index) => (
+              {topStores.map((store) => (
                 <div
                   key={store.name}
                   className="p-4 rounded-xl border border-slate-100 dark:border-slate-900 bg-slate-50/50 dark:bg-slate-900/10 flex flex-col justify-between"

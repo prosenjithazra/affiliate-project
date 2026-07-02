@@ -11,7 +11,6 @@ import {
   Label,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
   Dialog,
@@ -93,23 +92,23 @@ export default function BlogAdminPage() {
     }
   }, [postTitle, setValue, editingPost]);
 
-  const fetchPosts = async () => {
+  const fetchPosts = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/blogs");
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setPosts(data);
-    } catch (err: any) {
+    } catch {
       toastError("Unable to fetch blog posts. Showing mocks.", "Fetch Failed");
     } finally {
       setLoading(false);
     }
-  };
+  }, [toastError]);
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
 
   const handleEdit = (post: any) => {
     setEditingPost(post);

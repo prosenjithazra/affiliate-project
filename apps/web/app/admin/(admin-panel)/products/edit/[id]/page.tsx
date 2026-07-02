@@ -24,7 +24,7 @@ export default function EditProductPage() {
         } else {
           throw new Error("Failed to load product");
         }
-      } catch (err) {
+      } catch {
         toastError("Could not retrieve product information.", "Error");
       } finally {
         setLoading(false);
@@ -32,7 +32,7 @@ export default function EditProductPage() {
     };
 
     if (id) loadProduct();
-  }, [id]);
+  }, [id, toastError]);
 
   if (loading) {
     return (

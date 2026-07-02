@@ -39,12 +39,12 @@ export default function Footer() {
               </p>
               <div className="flex gap-3">
                 {[
-                  { Icon: Twitter, href: "#" },
-                  { Icon: Facebook, href: "#" },
-                  { Icon: Instagram, href: "#" },
-                ].map(({ Icon, href }) => (
+                  { Icon: Twitter, href: "#", name: "Twitter" },
+                  { Icon: Facebook, href: "#", name: "Facebook" },
+                  { Icon: Instagram, href: "#", name: "Instagram" },
+                ].map(({ Icon, href, name }) => (
                   <a
-                    key={href + Icon.name}
+                    key={name}
                     href={href}
                     className="h-8 w-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-450 hover:text-primary hover:border-primary/40 transition-all"
                   >
@@ -79,7 +79,7 @@ export default function Footer() {
                   { label: "Terms of Service", href: "/terms" },
                   { label: "Affiliate Disclosure", href: "/about" },
                 ].map((item) => (
-                  <li key={item.href}>
+                  <li key={item.label}>
                     <Link href={item.href} className="hover:text-primary transition-colors">
                       {item.label}
                     </Link>

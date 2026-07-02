@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui";
-import { Plus, Trash, Image as ImageIcon, UploadCloud, MoveUp, MoveDown } from "lucide-react";
+import { Trash, UploadCloud, MoveUp, MoveDown } from "lucide-react";
 import { Category, Brand, Product } from "@repo/types";
 
 const productSchema = z.object({
@@ -69,7 +69,6 @@ export default function ProductForm({ initialData }: ProductFormProps) {
   const {
     register,
     handleSubmit,
-    control,
     setValue,
     watch,
     formState: { errors },
@@ -133,7 +132,7 @@ export default function ProductForm({ initialData }: ProductFormProps) {
         const bRes = await fetch("/api/brands");
         if (catRes.ok) setCategories(await catRes.json());
         if (bRes.ok) setBrands(await bRes.json());
-      } catch (err) {
+      } catch {
         console.error("Failed to load selector options");
       }
     };

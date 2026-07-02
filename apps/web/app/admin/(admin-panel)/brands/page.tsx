@@ -11,7 +11,6 @@ import {
   Label,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
   Dialog,
@@ -71,23 +70,23 @@ export default function BrandsPage() {
     }
   }, [brandName, setValue, editingBrand]);
 
-  const fetchBrands = async () => {
+  const fetchBrands = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/brands");
       if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.ok ? await res.json() : [];
+      const data = res.ok ? await res.json() : [];
       setBrands(data);
-    } catch (err: any) {
+    } catch {
       toastError("Unable to fetch brands. Showing memory fallback.", "Fetch Failed");
     } finally {
       setLoading(false);
     }
-  };
+  }, [toastError]);
 
   useEffect(() => {
     fetchBrands();
-  }, []);
+  }, [fetchBrands]);
 
   const handleEdit = (brand: Brand) => {
     setEditingBrand(brand);

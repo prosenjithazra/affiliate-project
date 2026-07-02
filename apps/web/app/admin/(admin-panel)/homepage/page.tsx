@@ -16,7 +16,7 @@ import {
   CardTitle,
   useToast,
 } from "@repo/ui";
-import { Loader2, UploadCloud, Globe, SlidersHorizontal, Image } from "lucide-react";
+import { Loader2, UploadCloud, Globe, Image } from "lucide-react";
 import { Settings } from "@repo/types";
 
 const homepageSchema = z.object({
@@ -131,7 +131,7 @@ export default function HomepagePromosPage() {
             promo4Link: data.homepagePromos?.promo4?.link || "",
           });
         }
-      } catch (err) {
+      } catch {
         console.error("Failed to load settings data");
       } finally {
         setLoading(false);

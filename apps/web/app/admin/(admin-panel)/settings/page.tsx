@@ -98,7 +98,7 @@ export default function SettingsPage() {
             instagram: data.socialLinks?.instagram || "",
           });
         }
-      } catch (err) {
+      } catch {
         console.error("Failed to load settings data");
       } finally {
         setLoading(false);

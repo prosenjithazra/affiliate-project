@@ -11,7 +11,6 @@ import {
   Label,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
   Dialog,
@@ -87,23 +86,23 @@ export default function CategoriesPage() {
     }
   }, [categoryName, setValue, editingCategory]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/categories");
       if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.ok ? await res.json() : [];
+      const data = res.ok ? await res.json() : [];
       setCategories(data);
-    } catch (err: any) {
+    } catch {
       toastError("Unable to fetch categories. Displaying local data.", "Fetch Failed");
     } finally {
       setLoading(false);
     }
-  };
+  }, [toastError]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
