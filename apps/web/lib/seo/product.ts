@@ -18,7 +18,7 @@ export function buildOfferSchema(params: {
   return {
     "@type": "Offer",
     "price": params.price,
-    "priceCurrency": params.priceCurrency || "USD",
+    "priceCurrency": params.priceCurrency || "INR",
     "itemCondition": "https://schema.org/NewCondition",
     "availability": (params.availability || "https://schema.org/InStock") as any,
     "url": params.url,

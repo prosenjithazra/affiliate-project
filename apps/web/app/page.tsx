@@ -235,7 +235,7 @@ export default function HomePage() {
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800 p-4 sm:p-6 shadow-sm">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
-              { icon: <Truck className="h-8 w-8 text-primary shrink-0" />, title: "Free Shipping", desc: "For all order over $99" },
+              { icon: <Truck className="h-8 w-8 text-primary shrink-0" />, title: "Free Shipping", desc: "For all orders over ₹999" },
               { icon: <Clock className="h-8 w-8 text-primary shrink-0" />, title: "Delivery On Time", desc: "Break the lines wherever" },
               { icon: <ShieldCheck className="h-8 w-8 text-primary shrink-0" />, title: "Secure Payment", desc: "100% secure payment" },
               { icon: <RotateCcw className="h-8 w-8 text-primary shrink-0" />, title: "Shipping & Return", desc: "Photography online website" },

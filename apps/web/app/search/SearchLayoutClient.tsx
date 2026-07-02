@@ -154,7 +154,7 @@ export default function SearchLayoutClient({
 
       {/* Price bounds */}
       <div className="space-y-1.5">
-        <Label className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Price Bounds ($)</Label>
+        <Label className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500">Price Bounds (₹)</Label>
         <div className="flex gap-2">
           <Input
             placeholder="Min"

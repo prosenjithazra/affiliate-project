@@ -486,13 +486,13 @@ export default function ProductForm({ initialData }: ProductFormProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label htmlFor="price">Offer Price ($)</Label>
+                <Label htmlFor="price">Offer Price (₹)</Label>
                 <Input id="price" placeholder="349.99" {...register("price")} />
                 {errors.price && <p className="text-xs text-rose-500">{errors.price.message}</p>}
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="oldPrice">Old Price ($)</Label>
+                <Label htmlFor="oldPrice">Old Price (₹)</Label>
                 <Input id="oldPrice" placeholder="399.99" {...register("oldPrice")} />
                 {errors.oldPrice && <p className="text-xs text-rose-500">{errors.oldPrice.message}</p>}
               </div>
