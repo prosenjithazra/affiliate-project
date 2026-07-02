@@ -12,6 +12,14 @@ const nextConfig = {
   // Tell Next.js NOT to bundle @prisma/client — use the installed node_modules version
   serverExternalPackages: ["@prisma/client", "@repo/database"],
 
+  // Force Next.js and Vercel to package/trace the Prisma engine binaries from the root node_modules
+  outputFileTracingIncludes: {
+    "/**/*": [
+      "./../../node_modules/.prisma/client/schema.prisma",
+      "./../../node_modules/.prisma/client/query-engine-*"
+    ]
+  },
+
   // Image optimization remote host configurations
   images: {
     minimumCacheTTL: 31536000, // Cache images for 1 year
