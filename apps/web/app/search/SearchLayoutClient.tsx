@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Category, Brand, Product } from "@repo/types";
 import ProductCard from "../../components/ProductCard";
+import * as LucideIcons from "lucide-react";
 import {
   Button,
   Input,
@@ -17,7 +18,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@repo/ui";
-import { SlidersHorizontal, ArrowUpDown, RefreshCw, Star, ShoppingBag, X } from "lucide-react";
+import { SlidersHorizontal, ArrowUpDown, RefreshCw, ShoppingBag, X } from "lucide-react";
+
+type LucideComponent = React.ElementType<{ className?: string }>;
+
+const isLucideComponent = (value: unknown): value is LucideComponent => {
+  return (
+    typeof value === "function" ||
+    (typeof value === "object" &&
+      value !== null &&
+      "render" in value &&
+      typeof (value as { render?: unknown }).render === "function")
+  );
+};
+
+const getLucideIcon = (name?: string): LucideComponent => {
+  const icon = name ? (LucideIcons as Record<string, unknown>)[name] : null;
+  return isLucideComponent(icon) ? icon : ShoppingBag;
+};
+
+const CategoryIcon = ({
+  name,
+  className,
+}: {
+  name?: string;
+  className?: string;
+}) => {
+  const Icon = getLucideIcon(name);
+  return <Icon className={className} />;
+};
 
 interface Filters {
   query: string;
@@ -124,7 +153,10 @@ export default function SearchLayoutClient({
             <SelectItem value="all">All Categories</SelectItem>
           {categories.map((c) => (
             <SelectItem key={c.id} value={c.id}>
-              {c.name}
+              <span className="flex items-center gap-2">
+                <CategoryIcon name={c.icon} className="h-4 w-4 text-slate-400" />
+                <span>{c.name}</span>
+              </span>
             </SelectItem>
           ))}
           </SelectContent>

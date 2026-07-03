@@ -381,17 +381,16 @@ export default function CategoriesPage() {
                     <Image className="h-12 w-12" />
                   </div>
                 )}
-                <div className="absolute top-3 left-3 px-2.5 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm text-white flex items-center gap-1.5 text-xs font-semibold">
-                  {React.createElement(getLucideIcon(category.icon), {
-                    className: "h-3.5 w-3.5",
-                  })}
-                  {category.icon}
-                </div>
               </div>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <CardTitle className="text-lg font-bold">
+                  <div className="min-w-0">
+                    <CardTitle className="flex items-center gap-2 text-lg font-bold">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                        {React.createElement(getLucideIcon(category.icon), {
+                          className: "h-4 w-4",
+                        })}
+                      </span>
                       {category.name}
                     </CardTitle>
                     <span className="text-[10px] font-mono text-slate-400 block mt-0.5">
