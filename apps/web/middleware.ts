@@ -1,8 +1,8 @@
-import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const host = request.headers.get("host") || "";
   const pathname = url.pathname;
@@ -36,6 +36,7 @@ export function middleware(request: NextRequest) {
     "/admin/products",
     "/admin/categories",
     "/admin/brands",
+    "/admin/homepage",
     "/admin/blog",
     "/admin/settings"
   ];
@@ -54,18 +55,16 @@ export function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    return withAuth({
-      callbacks: {
-        authorized: ({ token }) => {
-          // Fallback bypass inside auth loop during build re-validations
-          if (process.env.NEXT_PHASE === "phase-production-build") return true;
-          return token?.role === "ADMIN";
-        }
-      },
-      pages: {
-        signIn: "/admin/login"
-      }
-    })(request as any, {} as any);
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (token?.role !== "ADMIN") {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", request.nextUrl.href);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   // Generate cryptographic nonce for inline scripts

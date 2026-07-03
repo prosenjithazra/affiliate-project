@@ -5,8 +5,8 @@
   "main": "./src/client.ts",
   "types": "./src/client.ts",
   "scripts": {
-    "build": "prisma generate",
-    "db:generate": "prisma generate",
+    "build": "prisma generate && node scripts/copy-prisma-engines.mjs",
+    "db:generate": "prisma generate && node scripts/copy-prisma-engines.mjs",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "seed": "tsx prisma/seed.ts"

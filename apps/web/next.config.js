@@ -12,11 +12,15 @@ const nextConfig = {
   // Tell Next.js NOT to bundle @prisma/client — use the installed node_modules version
   serverExternalPackages: ["@prisma/client", "@repo/database"],
 
-  // Force Next.js and Vercel to package/trace the Prisma engine binaries from the root node_modules
+  // Force Next.js and Vercel to package/trace Prisma engine binaries
   outputFileTracingIncludes: {
     "/**/*": [
       "./../../node_modules/.prisma/client/schema.prisma",
-      "./../../node_modules/.prisma/client/query-engine-*"
+      "./../../node_modules/.prisma/client/query-engine-*",
+      "./../../packages/database/node_modules/.prisma/client/schema.prisma",
+      "./../../packages/database/node_modules/.prisma/client/libquery_engine-*",
+      "./../../packages/database/node_modules/@prisma/client/schema.prisma",
+      "./../../packages/database/node_modules/@prisma/client/libquery_engine-*"
     ]
   },
 
