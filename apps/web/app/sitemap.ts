@@ -1,8 +1,7 @@
 import { MetadataRoute } from "next";
-import { prisma } from "@repo/database";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://shopzone.com";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://shopzone.com";
 
   // Static site paths with standard metadata priority/changefreq
   const staticPaths: MetadataRoute.Sitemap = [
@@ -20,7 +19,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 }
   ];
 
+  if (!process.env.DATABASE_URL) {
+    return staticPaths;
+  }
+
   try {
+    const { prisma } = await import("@repo/database");
+
     // Fetch dynamic products, categories, brands, and blogs from DB
     const [products, categories, brands, blogs] = await Promise.all([
       prisma.product.findMany({ select: { slug: true, updatedAt: true } }),
@@ -58,8 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     return [...staticPaths, ...productPaths, ...categoryPaths, ...brandPaths, ...blogPaths];
-  } catch (error) {
-    console.error("Prisma Sitemap generation failed, using static fallback routes:", error);
+  } catch {
+    console.warn("Dynamic sitemap data unavailable; using static fallback routes.");
     return staticPaths;
   }
 }
