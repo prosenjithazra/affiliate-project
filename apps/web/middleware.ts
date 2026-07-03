@@ -67,13 +67,12 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Generate cryptographic nonce for inline scripts
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-
-  // Construct strict CSP rules
+  // Construct CSP rules. Next's statically generated app shell includes inline
+  // hydration scripts, so production must allow inline scripts unless every page
+  // is rendered dynamically with a matching nonce.
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' ${process.env.NODE_ENV === "development" ? "'unsafe-eval' 'unsafe-inline'" : ""};
+    script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === "development" ? "'unsafe-eval'" : ""};
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https://images.unsplash.com https://*.supabase.co;
     font-src 'self' data:;
@@ -84,9 +83,8 @@ export async function middleware(request: NextRequest) {
     upgrade-insecure-requests;
   `.replace(/\s{2,}/g, " ").trim();
 
-  // Forward nonce and CSP via request headers
+  // Forward CSP via request headers
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("content-security-policy", cspHeader);
 
   const response = NextResponse.next({
