@@ -16,17 +16,20 @@ import {
   CardTitle,
   useToast,
 } from "@repo/ui";
-import { Settings as SettingsIcon, Globe, Share2, Mail, Loader2, UploadCloud } from "lucide-react";
+import { Settings as SettingsIcon, Globe, Share2, Mail, Loader2, Phone } from "lucide-react";
 import { Settings } from "@repo/types";
 
 const settingsSchema = z.object({
   websiteName: z.string().min(2, "Name must be at least 2 characters"),
   logo: z.string().optional(),
-  seoTitle: z.string().min(10, "Title must be at least 10 characters"),
-  seoDescription: z.string().min(20, "Description must be at least 20 characters"),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
   googleAnalyticsId: z.string().optional(),
   contactEmail: z.string().email("Must be a valid email address").or(z.literal("")),
+  partnershipEmail: z.string().email("Must be a valid email address").or(z.literal("")),
+  phoneNumber: z.string().min(1, "Phone number is required"),
   footerText: z.string().optional(),
+  footerYear: z.coerce.number().int().min(2000, "Use a valid year").max(2100, "Use a valid year"),
   twitter: z.string().optional(),
   facebook: z.string().optional(),
   instagram: z.string().optional(),
@@ -42,8 +45,6 @@ export default function SettingsPage() {
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<SettingsFormValues>({
@@ -55,28 +56,15 @@ export default function SettingsPage() {
       seoDescription: "",
       googleAnalyticsId: "",
       contactEmail: "",
+      partnershipEmail: "",
+      phoneNumber: "",
       footerText: "",
+      footerYear: 2026,
       twitter: "",
       facebook: "",
       instagram: "",
     },
   });
-
-  const logo = watch("logo");
-
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === "string") {
-        setValue("logo", reader.result, { shouldValidate: true });
-      }
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  };
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -92,7 +80,10 @@ export default function SettingsPage() {
             seoDescription: data.seoDescription || "",
             googleAnalyticsId: data.googleAnalyticsId || "",
             contactEmail: data.contactEmail || "",
+            partnershipEmail: data.contactPage?.partnershipValue || "",
+            phoneNumber: data.contactPage?.hotlineValue || "",
             footerText: data.footerText || "",
+            footerYear: data.footerYear || 2026,
             twitter: data.socialLinks?.twitter || "",
             facebook: data.socialLinks?.facebook || "",
             instagram: data.socialLinks?.instagram || "",
@@ -112,12 +103,17 @@ export default function SettingsPage() {
     try {
       const payload = {
         websiteName: values.websiteName,
-        logo: values.logo || null,
         seoTitle: values.seoTitle || null,
         seoDescription: values.seoDescription || null,
         googleAnalyticsId: values.googleAnalyticsId || null,
         contactEmail: values.contactEmail || null,
+        contactPage: {
+          supportValue: values.contactEmail || "",
+          partnershipValue: values.partnershipEmail || "",
+          hotlineValue: values.phoneNumber || "",
+        },
         footerText: values.footerText || null,
+        footerYear: values.footerYear,
         socialLinks: {
           twitter: values.twitter || "",
           facebook: values.facebook || "",
@@ -134,7 +130,8 @@ export default function SettingsPage() {
       if (res.ok) {
         toastSuccess("Configuration updated successfully.", "Settings Saved");
       } else {
-        throw new Error("Failed to save settings");
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Failed to save settings");
       }
     } catch (err: any) {
       toastError(err.message || "Could not write configurations.", "Error");
@@ -174,39 +171,24 @@ export default function SettingsPage() {
                 <CardDescription>Configure naming and core brand assets</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label htmlFor="websiteName">Website Title Name</Label>
                     <Input id="websiteName" {...register("websiteName")} />
                     {errors.websiteName && <p className="text-xs text-rose-500">{errors.websiteName.message}</p>}
                   </div>
-
-                  <div className="space-y-1.5">
-                    <Label>Logo Image</Label>
-                    <input type="hidden" {...register("logo")} />
-                    <div className="relative flex h-24 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-center transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/40 dark:hover:bg-slate-900">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoUpload}
-                        className="absolute inset-0 cursor-pointer opacity-0"
-                      />
-                      {logo ? (
-                        <img src={logo} alt="Logo preview" className="max-h-16 max-w-[85%] rounded-lg object-contain" />
-                      ) : (
-                        <>
-                          <UploadCloud className="mb-1 h-5 w-5 text-slate-400" />
-                          <span className="text-[10px] font-bold text-slate-500">Upload Logo</span>
-                        </>
-                      )}
-                    </div>
-                    {errors.logo && <p className="text-xs text-rose-500">{errors.logo.message}</p>}
-                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="footerText">Copyright Footer Notice</Label>
-                  <Input id="footerText" placeholder="© 2026 AffiliateHub. All rights reserved." {...register("footerText")} />
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_160px] gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="footerText">Copyright Footer Notice</Label>
+                    <Input id="footerText" placeholder="AffiliateHub. Outbound links may earn us a small commission." {...register("footerText")} />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="footerYear">Footer Year</Label>
+                    <Input id="footerYear" type="number" {...register("footerYear")} />
+                    {errors.footerYear && <p className="text-xs text-rose-500">{errors.footerYear.message}</p>}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -247,9 +229,21 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-1">
-                  <Label htmlFor="contactEmail">Contact Email Address</Label>
+                  <Label htmlFor="contactEmail">Support Email Address</Label>
                   <Input id="contactEmail" placeholder="support@affiliate.com" {...register("contactEmail")} />
                   {errors.contactEmail && <p className="text-xs text-rose-500">{errors.contactEmail.message}</p>}
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="partnershipEmail">Partnership Email Address</Label>
+                  <Input id="partnershipEmail" placeholder="partners@affiliate.com" {...register("partnershipEmail")} />
+                  {errors.partnershipEmail && <p className="text-xs text-rose-500">{errors.partnershipEmail.message}</p>}
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Input id="phoneNumber" placeholder="+1 (555) 321-7890" {...register("phoneNumber")} />
+                  {errors.phoneNumber && <p className="text-xs text-rose-500">{errors.phoneNumber.message}</p>}
                 </div>
 
                 <div className="space-y-1">

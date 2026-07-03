@@ -95,10 +95,21 @@ export interface Settings {
   seoDescription?: string | null;
   socialLinks: Record<string, string>; // e.g. { twitter: '...', facebook: '...' }
   homepagePromos?: any; // e.g. promo configs
+  contactPage?: any; // e.g. contact page copy, cards, form labels
   footerText?: string | null;
+  footerYear?: number | null;
   contactEmail?: string | null;
   googleAnalyticsId?: string | null;
   updatedAt: Date;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  createdAt: Date;
 }
 
 // Wishlist item helper

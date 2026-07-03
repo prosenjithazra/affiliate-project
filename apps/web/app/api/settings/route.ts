@@ -34,6 +34,28 @@ const defaultPromos = {
   },
 };
 
+const defaultContactPage = {
+  title: "Contact Us",
+  subtitle: "Have questions about a product specifications table, or want to list your store? Get in touch.",
+  supportLabel: "Email Support",
+  supportValue: "support@affiliatehub.com",
+  partnershipLabel: "Partnership Queries",
+  partnershipValue: "partners@affiliatehub.com",
+  hotlineLabel: "Hotline",
+  hotlineValue: "+1 (555) 321-7890",
+  nameLabel: "Full Name",
+  namePlaceholder: "John Doe",
+  emailLabel: "Email Address",
+  emailPlaceholder: "john@example.com",
+  subjectLabel: "Subject",
+  subjectPlaceholder: "e.g. Partnership Request",
+  messageLabel: "Message",
+  messagePlaceholder: "Write your message here...",
+  submitLabel: "Send Message",
+  successTitle: "Message Sent",
+  successMessage: "Your message has been sent to our editor team. We'll reply within 24 hours.",
+};
+
 function withDefaultPromos(settings: any) {
   return {
     ...settings,
@@ -41,12 +63,33 @@ function withDefaultPromos(settings: any) {
       ...defaultPromos,
       ...(settings.homepagePromos || {}),
     },
+    contactPage: {
+      ...defaultContactPage,
+      ...(settings.contactPage || {}),
+    },
+    footerYear: settings.footerYear ?? 2026,
   };
+}
+
+function withoutUndefined<T extends Record<string, any>>(data: T) {
+  return Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined)
+  );
+}
+
+async function ensureSettingsSchema() {
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE "Settings"
+    ADD COLUMN IF NOT EXISTS "contactPage" JSONB,
+    ADD COLUMN IF NOT EXISTS "footerYear" INTEGER NOT NULL DEFAULT 2026
+  `);
 }
 
 // GET /api/settings
 export async function GET() {
   try {
+    await ensureSettingsSchema();
+
     let settings = await prisma.settings.findUnique({
       where: { id: SETTINGS_ID },
     });
@@ -59,6 +102,8 @@ export async function GET() {
           websiteName: "ShopZone",
           socialLinks: {},
           homepagePromos: defaultPromos,
+          contactPage: defaultContactPage,
+          footerYear: 2026,
         } as any,
       });
     }
@@ -86,12 +131,30 @@ export async function PUT(req: NextRequest) {
       seoDescription,
       socialLinks,
       homepagePromos,
+      contactPage,
       footerText,
+      footerYear,
       contactEmail,
       googleAnalyticsId,
     } = body;
 
     try {
+      await ensureSettingsSchema();
+
+      const updateData = withoutUndefined({
+        websiteName,
+        logo,
+        seoTitle,
+        seoDescription,
+        socialLinks,
+        homepagePromos,
+        contactPage,
+        footerText,
+        footerYear,
+        contactEmail,
+        googleAnalyticsId,
+      });
+
       const settings = await prisma.settings.upsert({
         where: { id: SETTINGS_ID },
         create: {
@@ -102,21 +165,13 @@ export async function PUT(req: NextRequest) {
           seoDescription,
           socialLinks: socialLinks || {},
           homepagePromos: homepagePromos || defaultPromos,
+          contactPage: contactPage || defaultContactPage,
           footerText,
+          footerYear: footerYear ?? 2026,
           contactEmail,
           googleAnalyticsId,
         } as any,
-        update: {
-          websiteName,
-          logo,
-          seoTitle,
-          seoDescription,
-          socialLinks: socialLinks || {},
-          homepagePromos: homepagePromos || null,
-          footerText,
-          contactEmail,
-          googleAnalyticsId,
-        } as any,
+        update: updateData as any,
       });
       return NextResponse.json(withDefaultPromos(settings));
     } catch (dbError) {

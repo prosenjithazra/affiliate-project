@@ -108,10 +108,21 @@ model Settings {
   seoDescription    String?
   socialLinks       Json     // e.g. { "twitter": "", "facebook": "" }
   homepagePromos    Json?    // e.g. { "promo1": {...}, "promo2": {...} }
+  contactPage       Json?    // e.g. contact page copy, cards, form labels
   footerText        String?
+  footerYear        Int      @default(2026)
   contactEmail      String?
   googleAnalyticsId String?
   updatedAt         DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
 }
 
 model BlogPost {

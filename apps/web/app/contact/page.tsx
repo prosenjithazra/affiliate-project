@@ -1,23 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { Button, Input, Textarea, Label, Card, CardContent, useToast } from "@repo/ui";
 import { Mail, MessageSquare, Phone } from "lucide-react";
+import { Settings } from "@repo/types";
+
+const defaultContactPage = {
+  supportValue: "support@affiliatehub.com",
+  partnershipValue: "partners@affiliatehub.com",
+  hotlineValue: "+1 (555) 321-7890",
+};
 
 export default function ContactPage() {
-  const { success } = useToast();
+  const { success, error } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [contactPage, setContactPage] = useState(defaultContactPage);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((settings: Settings | null) => {
+        if (settings) {
+          setContactPage({
+            ...defaultContactPage,
+            supportValue: settings.contactEmail || settings.contactPage?.supportValue || defaultContactPage.supportValue,
+            partnershipValue: settings.contactPage?.partnershipValue || defaultContactPage.partnershipValue,
+            hotlineValue: settings.contactPage?.hotlineValue || defaultContactPage.hotlineValue,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => {
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          subject: formData.get("subject"),
+          message: formData.get("message"),
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Message could not be sent");
+      }
+
       success("Your message has been sent to our editor team. We'll reply within 24 hours.", "Message Sent");
+      form.reset();
+    } catch (err: any) {
+      error(err.message || "Message could not be sent", "Error");
+    } finally {
       setSubmitting(false);
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+    }
   };
 
   return (
@@ -39,7 +86,7 @@ export default function ContactPage() {
               <Mail className="h-5 w-5 text-primary shrink-0" />
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Email Support</p>
-                <p className="text-xs font-semibold">support@affiliatehub.com</p>
+                <p className="text-xs font-semibold">{contactPage.supportValue}</p>
               </div>
             </div>
 
@@ -47,7 +94,7 @@ export default function ContactPage() {
               <MessageSquare className="h-5 w-5 text-emerald-500 shrink-0" />
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Partnership Queries</p>
-                <p className="text-xs font-semibold">partners@affiliatehub.com</p>
+                <p className="text-xs font-semibold">{contactPage.partnershipValue}</p>
               </div>
             </div>
 
@@ -55,7 +102,7 @@ export default function ContactPage() {
               <Phone className="h-5 w-5 text-amber-500 shrink-0" />
               <div>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Hotline</p>
-                <p className="text-xs font-semibold">+1 (555) 321-7890</p>
+                <p className="text-xs font-semibold">{contactPage.hotlineValue}</p>
               </div>
             </div>
           </div>
@@ -68,22 +115,22 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="John Doe" required />
+                  <Input id="name" name="name" placeholder="John Doe" required />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" required />
+                  <Input id="email" name="email" type="email" placeholder="john@example.com" required />
                 </div>
               </div>
 
               <div className="space-y-1">
                 <Label htmlFor="subject">Subject</Label>
-                <Input id="subject" placeholder="e.g. Partnership Request" required />
+                <Input id="subject" name="subject" placeholder="e.g. Partnership Request" required />
               </div>
 
               <div className="space-y-1">
                 <Label htmlFor="message">Message</Label>
-                <Textarea id="message" rows={5} placeholder="Write your message here..." required />
+                <Textarea id="message" name="message" rows={5} placeholder="Write your message here..." required />
               </div>
 
               <Button type="submit" className="w-full bg-primary text-white hover:bg-primary-hover py-5 font-bold" loading={submitting}>

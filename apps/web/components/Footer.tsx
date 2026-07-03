@@ -1,13 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useToast } from "@repo/ui";
 import { Twitter, Facebook, Instagram, Mail, ArrowRight, Shield, Star } from "lucide-react";
+import { Settings } from "@repo/types";
 
 export default function Footer() {
   const { success } = useToast();
   const [email, setEmail] = useState("");
+  const [settings, setSettings] = useState<Settings | null>(null);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: Settings | null) => setSettings(data))
+      .catch(() => {});
+  }, []);
+
+  const websiteName = settings?.websiteName || "ShopZone";
+  const logo = settings?.logo || "/logoNewUpdate.png";
+  const socialLinks = settings?.socialLinks || {};
+  const footerYear = settings?.footerYear || new Date().getFullYear();
+  const footerText = settings?.footerText || `${websiteName} || All rights reserved.`;
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +44,8 @@ export default function Footer() {
             <div className="sm:col-span-2 md:col-span-1 space-y-4">
               <Link href="/" className="inline-block">
                 <img
-                  src="/logoNewUpdate.png"
-                  alt="ShopZone"
+                  src={logo}
+                  alt={websiteName}
                   className="h-16 w-auto object-contain dark:brightness-0 dark:invert"
                 />
               </Link>
@@ -39,9 +54,9 @@ export default function Footer() {
               </p>
               <div className="flex gap-3">
                 {[
-                  { Icon: Twitter, href: "#", name: "Twitter" },
-                  { Icon: Facebook, href: "#", name: "Facebook" },
-                  { Icon: Instagram, href: "#", name: "Instagram" },
+                  { Icon: Twitter, href: socialLinks.twitter || "#", name: "Twitter" },
+                  { Icon: Facebook, href: socialLinks.facebook || "#", name: "Facebook" },
+                  { Icon: Instagram, href: socialLinks.instagram || "#", name: "Instagram" },
                 ].map(({ Icon, href, name }) => (
                   <a
                     key={name}
@@ -128,7 +143,7 @@ export default function Footer() {
       {/* ── Bottom Bar ───────────────────────────────────── */}
       <div className="bg-white dark:bg-slate-950 text-slate-500 dark:text-slate-450 border-t border-slate-200 dark:border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 text-[11px]">
-          <p>© 2026 ShopZone || All rights reserved.</p>
+          <p>© {footerYear} {footerText.replace(/^©\s*\d{4}\s*/u, "")}</p>
         </div>
       </div>
     </footer>
