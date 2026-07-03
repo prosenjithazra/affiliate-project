@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button, Input, Label, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, useToast } from "@repo/ui";
 import { Lock, Mail, ShieldAlert } from "lucide-react";
@@ -16,6 +17,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
   const { success: toastSuccess, error: toastError } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -47,7 +49,7 @@ export default function LoginPage() {
         toastError(errorMsg, "Login Failed");
       } else {
         toastSuccess("Welcome back to the Admin Dashboard!", "Access Granted");
-        window.location.href = "/admin/dashboard";
+        window.location.href = searchParams.get("callbackUrl") || "/admin/dashboard";
       }
     } catch (err: any) {
       toastError(err?.message || "An unexpected error occurred", "System Error");
