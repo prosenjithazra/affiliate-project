@@ -43,26 +43,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name and Slug are required" }, { status: 400 });
     }
 
-    try {
-      const brand = await prisma.brand.create({
-        data: { name, slug, logo: logo || "", description: description || "" }
-      });
-      return NextResponse.json(brand, { status: 201 });
-    } catch (dbError) {
-      console.warn("Database failed to create brand. Creating mock instead.", dbError);
-      const newMock: any = {
-        id: "brand-" + Math.random().toString(36).substring(2, 9),
-        name,
-        slug,
-        logo: logo || "",
-        description: description || "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        _count: { products: 0 }
-      };
-      mockBrands.push(newMock);
-      return NextResponse.json(newMock, { status: 201 });
+    const existing = await prisma.brand.findUnique({ where: { slug } });
+    if (existing) {
+      return NextResponse.json({ error: "A brand with this slug already exists" }, { status: 409 });
     }
+
+    const brand = await prisma.brand.create({
+      data: { name, slug, logo: logo || "", description: description || "" },
+      include: {
+        _count: {
+          select: { products: true }
+        }
+      }
+    });
+    return NextResponse.json(brand, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

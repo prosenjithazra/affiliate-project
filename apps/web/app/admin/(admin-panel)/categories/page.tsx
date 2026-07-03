@@ -20,13 +20,19 @@ import {
   DialogHeader,
   DialogTitle,
   useToast,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@repo/ui";
-import { Plus, Edit2, Trash2, Folder, Image, Loader2, Sparkles, Laptop, Shirt, Gamepad2, Dumbbell, Compass, UploadCloud } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Folder,
+  Image,
+  Loader2,
+  UploadCloud,
+  ChevronDown,
+  Search,
+} from "lucide-react";
 import { Category } from "@repo/types";
 
 const categorySchema = z.object({
@@ -39,14 +45,140 @@ const categorySchema = z.object({
 
 type CategoryFormValues = z.infer<typeof categorySchema>;
 
-const AVAILABLE_ICONS = [
-  { name: "Laptop", icon: <Laptop className="h-4 w-4" /> },
-  { name: "Shirt", icon: <Shirt className="h-4 w-4" /> },
-  { name: "Sparkles", icon: <Sparkles className="h-4 w-4" /> },
-  { name: "Gamepad2", icon: <Gamepad2 className="h-4 w-4" /> },
-  { name: "Dumbbell", icon: <Dumbbell className="h-4 w-4" /> },
-  { name: "Compass", icon: <Compass className="h-4 w-4" /> },
-];
+type IconComponent = React.ElementType<{ className?: string }>;
+
+const isLucideComponent = (value: unknown): value is IconComponent => {
+  return (
+    typeof value === "function" ||
+    (typeof value === "object" &&
+      value !== null &&
+      "render" in value &&
+      typeof (value as { render?: unknown }).render === "function")
+  );
+};
+
+const LUCIDE_ICON_NAMES = Object.entries(LucideIcons)
+  .filter(([name, value]) => {
+    return /^[A-Z]/.test(name) && name !== "Icon" && isLucideComponent(value);
+  })
+  .map(([name]) => name)
+  .sort((a, b) => a.localeCompare(b));
+
+const getLucideIcon = (name?: string): IconComponent => {
+  const icon = name ? (LucideIcons as Record<string, unknown>)[name] : null;
+  return isLucideComponent(icon) ? icon : Folder;
+};
+
+function IconAutocomplete({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const [query, setQuery] = useState(value);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
+
+  const filteredIcons = React.useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    const matches = normalizedQuery
+      ? LUCIDE_ICON_NAMES.filter((name) =>
+          name.toLowerCase().includes(normalizedQuery),
+        )
+      : LUCIDE_ICON_NAMES;
+
+    return matches.slice(0, 80);
+  }, [query]);
+
+  const SelectedIcon = getLucideIcon(value);
+
+  const selectIcon = (name: string) => {
+    onChange(name);
+    setQuery(name);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="relative"
+      onBlur={() => {
+        window.setTimeout(() => setOpen(false), 120);
+      }}
+    >
+      <div className="relative">
+        <SelectedIcon className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+        <Input
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          placeholder="Search Lucide icons"
+          className="pl-10 pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          className="absolute right-2 top-2 rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-900"
+          aria-label="Toggle icon list"
+        >
+          <ChevronDown className="h-4 w-4" />
+        </button>
+      </div>
+
+      {open && (
+        <div className="absolute z-50 mt-1 max-h-72 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-950">
+          <div className="flex items-center gap-2 border-b border-slate-100 px-3 py-2 text-xs text-slate-400 dark:border-slate-900">
+            <Search className="h-3.5 w-3.5" />
+            {filteredIcons.length} matching icons
+          </div>
+          <div className="max-h-60 overflow-y-auto p-1">
+            {filteredIcons.length > 0 ? (
+              filteredIcons.map((name) => {
+                const Icon = getLucideIcon(name);
+                const selected = name === value;
+
+                return (
+                  <button
+                    key={name}
+                    type="button"
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectIcon(name)}
+                    className={`flex w-full items-center gap-3 rounded-md px-2 py-2 text-left text-sm transition-colors ${
+                      selected
+                        ? "bg-primary/10 text-primary"
+                        : "text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${
+                        selected
+                          ? "border-primary/30 bg-primary/10"
+                          : "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900"
+                      }`}
+                    >
+                      <Icon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="truncate">{name}</span>
+                  </button>
+                );
+              })
+            ) : (
+              <p className="px-3 py-6 text-center text-xs text-slate-400">
+                No Lucide icons found.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function CategoriesPage() {
   const { success: toastSuccess, error: toastError } = useToast();
@@ -94,7 +226,10 @@ export default function CategoriesPage() {
       const data = res.ok ? await res.json() : [];
       setCategories(data);
     } catch {
-      toastError("Unable to fetch categories. Displaying local data.", "Fetch Failed");
+      toastError(
+        "Unable to fetch categories. Displaying local data.",
+        "Fetch Failed",
+      );
     } finally {
       setLoading(false);
     }
@@ -138,7 +273,9 @@ export default function CategoriesPage() {
   const onSubmit = async (data: CategoryFormValues) => {
     setSubmitting(true);
     try {
-      const url = editingCategory ? `/api/categories/${editingCategory.id}` : "/api/categories";
+      const url = editingCategory
+        ? `/api/categories/${editingCategory.id}`
+        : "/api/categories";
       const method = editingCategory ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -149,8 +286,10 @@ export default function CategoriesPage() {
 
       if (res.ok) {
         toastSuccess(
-          editingCategory ? "Category successfully updated." : "Category successfully created.",
-          editingCategory ? "Category Updated" : "Category Created"
+          editingCategory
+            ? "Category successfully updated."
+            : "Category successfully created.",
+          editingCategory ? "Category Updated" : "Category Created",
         );
         setOpen(false);
         setEditingCategory(null);
@@ -216,14 +355,20 @@ export default function CategoriesPage() {
           <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mt-1">
             Start by adding categories like Electronics, Gaming, or Fashion.
           </p>
-          <Button onClick={() => setOpen(true)} className="mt-4 bg-primary hover:bg-primary-hover text-white">
+          <Button
+            onClick={() => setOpen(true)}
+            className="mt-4 bg-primary hover:bg-primary-hover text-white"
+          >
             Add First Category
           </Button>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
-            <Card key={category.id} className="overflow-hidden border-slate-200/60 dark:border-slate-900/60 group hover:shadow-lg transition-all duration-300">
+            <Card
+              key={category.id}
+              className="overflow-hidden border-slate-200/60 dark:border-slate-900/60 group hover:shadow-lg transition-all duration-300"
+            >
               <div className="h-40 relative bg-slate-100 dark:bg-slate-900">
                 {category.image ? (
                   <img
@@ -237,14 +382,18 @@ export default function CategoriesPage() {
                   </div>
                 )}
                 <div className="absolute top-3 left-3 px-2.5 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm text-white flex items-center gap-1.5 text-xs font-semibold">
-                  {AVAILABLE_ICONS.find((i) => i.name === category.icon)?.icon || <Folder className="h-3.5 w-3.5" />}
+                  {React.createElement(getLucideIcon(category.icon), {
+                    className: "h-3.5 w-3.5",
+                  })}
                   {category.icon}
                 </div>
               </div>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <CardTitle className="text-lg font-bold">{category.name}</CardTitle>
+                    <CardTitle className="text-lg font-bold">
+                      {category.name}
+                    </CardTitle>
                     <span className="text-[10px] font-mono text-slate-400 block mt-0.5">
                       /{category.slug}
                     </span>
@@ -282,7 +431,9 @@ export default function CategoriesPage() {
       <Dialog open={open} onOpenChange={(v) => !v && handleModalClose()}>
         <DialogContent className="border-slate-200 dark:border-slate-800">
           <DialogHeader>
-            <DialogTitle>{editingCategory ? "Edit Category" : "Add New Category"}</DialogTitle>
+            <DialogTitle>
+              {editingCategory ? "Edit Category" : "Add New Category"}
+            </DialogTitle>
             <DialogDescription>
               Create a grouping card. Names generate slugs automatically.
             </DialogDescription>
@@ -291,32 +442,49 @@ export default function CategoriesPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1">
               <Label htmlFor="name">Category Name</Label>
-              <Input id="name" placeholder="e.g. Smart Watches" {...register("name")} />
-              {errors.name && <p className="text-xs text-rose-500 font-medium">{errors.name.message}</p>}
+              <Input
+                id="name"
+                placeholder="e.g. Smart Watches"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-xs text-rose-500 font-medium">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1">
               <Label htmlFor="slug">Category Slug</Label>
-              <Input id="slug" placeholder="e.g. smart-watches" {...register("slug")} />
-              {errors.slug && <p className="text-xs text-rose-500 font-medium">{errors.slug.message}</p>}
+              <Input
+                id="slug"
+                placeholder="e.g. smart-watches"
+                {...register("slug")}
+              />
+              {errors.slug && (
+                <p className="text-xs text-rose-500 font-medium">
+                  {errors.slug.message}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1 flex flex-col">
-                <Label htmlFor="icon" className="mb-1.5">Category Icon</Label>
+                <Label htmlFor="icon" className="mb-1.5">
+                  Category Icon
+                </Label>
                 <input type="hidden" {...register("icon")} />
-                <Select value={watch("icon")} onValueChange={(value) => setValue("icon", value, { shouldValidate: true })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select icon" />
-                  </SelectTrigger>
-                  <SelectContent>
-                  {AVAILABLE_ICONS.map((i) => (
-                    <SelectItem key={i.name} value={i.name}>
-                      {i.name}
-                    </SelectItem>
-                  ))}
-                  </SelectContent>
-                </Select>
+                <IconAutocomplete
+                  value={watch("icon")}
+                  onChange={(value) =>
+                    setValue("icon", value, { shouldValidate: true })
+                  }
+                />
+                {errors.icon && (
+                  <p className="text-xs text-rose-500 font-medium">
+                    {errors.icon.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -330,15 +498,25 @@ export default function CategoriesPage() {
                     className="absolute inset-0 cursor-pointer opacity-0"
                   />
                   {categoryImage ? (
-                    <img src={categoryImage} alt="Category preview" className="h-full w-full rounded-lg object-cover" />
+                    <img
+                      src={categoryImage}
+                      alt="Category preview"
+                      className="h-full w-full rounded-lg object-cover"
+                    />
                   ) : (
                     <>
                       <UploadCloud className="mb-1 h-5 w-5 text-slate-400" />
-                      <span className="text-[10px] font-bold text-slate-500">Upload Image</span>
+                      <span className="text-[10px] font-bold text-slate-500">
+                        Upload Image
+                      </span>
                     </>
                   )}
                 </div>
-                {errors.image && <p className="text-xs text-rose-500 font-medium">{errors.image.message}</p>}
+                {errors.image && (
+                  <p className="text-xs text-rose-500 font-medium">
+                    {errors.image.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -350,14 +528,26 @@ export default function CategoriesPage() {
                 placeholder="Give a short summary of items contained in this category..."
                 {...register("description")}
               />
-              {errors.description && <p className="text-xs text-rose-500 font-medium">{errors.description.message}</p>}
+              {errors.description && (
+                <p className="text-xs text-rose-500 font-medium">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleModalClose}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleModalClose}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-primary text-white hover:bg-primary-hover" loading={submitting}>
+              <Button
+                type="submit"
+                className="bg-primary text-white hover:bg-primary-hover"
+                loading={submitting}
+              >
                 {editingCategory ? "Save Changes" : "Create Category"}
               </Button>
             </DialogFooter>

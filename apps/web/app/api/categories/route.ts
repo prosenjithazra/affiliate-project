@@ -43,27 +43,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name and Slug are required" }, { status: 400 });
     }
 
-    try {
-      const category = await prisma.category.create({
-        data: { name, slug, description: description || "", image: image || "", icon: icon || "Folder" }
-      });
-      return NextResponse.json(category, { status: 201 });
-    } catch (dbError) {
-      console.warn("Database failed to create category. Creating mock instead.", dbError);
-      const newMock: any = {
-        id: "cat-" + Math.random().toString(36).substring(2, 9),
+    const existing = await prisma.category.findUnique({ where: { slug } });
+    if (existing) {
+      return NextResponse.json({ error: "A category with this slug already exists" }, { status: 409 });
+    }
+
+    const category = await prisma.category.create({
+      data: {
         name,
         slug,
         description: description || "",
         image: image || "",
-        icon: icon || "Folder",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        _count: { products: 0 }
-      };
-      mockCategories.push(newMock);
-      return NextResponse.json(newMock, { status: 201 });
-    }
+        icon: icon || "Folder"
+      },
+      include: {
+        _count: {
+          select: { products: true }
+        }
+      }
+    });
+    return NextResponse.json(category, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
