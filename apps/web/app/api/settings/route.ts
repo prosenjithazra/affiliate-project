@@ -7,6 +7,42 @@ export const dynamic = "force-dynamic";
 
 const SETTINGS_ID = "site-settings";
 
+const defaultPromos = {
+  promo1: {
+    title: "Dinamic Tracking",
+    desc: "Artisanal rugs, wallpaper, classic vases, and lighting accessories—well-made and carefully considered—whether made by Heath or by like-minded makers we admire. Welcome in.",
+    img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
+    link: "/search",
+  },
+  promo2: {
+    title: "Audio Speaker A1",
+    desc: "Lasted answer oppose to ye months no esteem. Branched is on an ecstatic directly it.",
+    img: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800",
+    link: "/search",
+  },
+  promo3: {
+    title: "Headphone",
+    desc: "Headphones give you a great experience. Verified ratings and specs.",
+    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+    link: "/search",
+  },
+  promo4: {
+    title: "Smart Watch",
+    desc: "It is a long established fact that a reader will. Aggregated specs and direct links.",
+    img: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800",
+    link: "/search",
+  },
+};
+
+function withDefaultPromos(settings: any) {
+  return {
+    ...settings,
+    homepagePromos: {
+      ...defaultPromos,
+      ...(settings.homepagePromos || {}),
+    },
+  };
+}
 
 // GET /api/settings
 export async function GET() {
@@ -14,33 +50,6 @@ export async function GET() {
     let settings = await prisma.settings.findUnique({
       where: { id: SETTINGS_ID },
     });
-
-    const defaultPromos = {
-      promo1: {
-        title: "Dinamic Tracking",
-        desc: "Artisanal rugs, wallpaper, classic vases, and lighting accessories—well-made and carefully considered—whether made by Heath or by like-minded makers we admire. Welcome in.",
-        img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800",
-        link: "/search"
-      },
-      promo2: {
-        title: "Audio Speaker A1",
-        desc: "Lasted answer oppose to ye months no esteem. Branched is on an ecstatic directly it.",
-        img: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=800",
-        link: "/search"
-      },
-      promo3: {
-        title: "Headphone",
-        desc: "Headphones give you a great experience. Verified ratings and specs.",
-        img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
-        link: "/search"
-      },
-      promo4: {
-        title: "Smart Watch",
-        desc: "It is a long established fact that a reader will. Aggregated specs and direct links.",
-        img: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=800",
-        link: "/search"
-      }
-    };
 
     if (!settings) {
       // Create default settings if not exists
@@ -52,17 +61,12 @@ export async function GET() {
           homepagePromos: defaultPromos,
         } as any,
       });
-    } else if (!(settings as any).homepagePromos) {
-      settings = {
-        ...settings,
-        homepagePromos: defaultPromos,
-      } as any;
     }
 
-    return NextResponse.json(settings);
+    return NextResponse.json(withDefaultPromos(settings));
   } catch (error) {
     console.warn("Database failed to load settings. Returning mock settings instead.");
-    return NextResponse.json(mockSettings);
+    return NextResponse.json(withDefaultPromos(mockSettings));
   }
 }
 
@@ -88,9 +92,21 @@ export async function PUT(req: NextRequest) {
     } = body;
 
     try {
-      const settings = await prisma.settings.update({
+      const settings = await prisma.settings.upsert({
         where: { id: SETTINGS_ID },
-        data: {
+        create: {
+          id: SETTINGS_ID,
+          websiteName: websiteName ?? "ShopZone",
+          logo,
+          seoTitle,
+          seoDescription,
+          socialLinks: socialLinks || {},
+          homepagePromos: homepagePromos || defaultPromos,
+          footerText,
+          contactEmail,
+          googleAnalyticsId,
+        } as any,
+        update: {
           websiteName,
           logo,
           seoTitle,
@@ -102,20 +118,13 @@ export async function PUT(req: NextRequest) {
           googleAnalyticsId,
         } as any,
       });
-      return NextResponse.json(settings);
+      return NextResponse.json(withDefaultPromos(settings));
     } catch (dbError) {
-      console.warn("Database failed to update settings. Mutating mock instead.");
-      mockSettings.websiteName = websiteName ?? mockSettings.websiteName;
-      mockSettings.logo = logo ?? mockSettings.logo;
-      mockSettings.seoTitle = seoTitle ?? mockSettings.seoTitle;
-      mockSettings.seoDescription = seoDescription ?? mockSettings.seoDescription;
-      mockSettings.socialLinks = socialLinks ?? mockSettings.socialLinks;
-      mockSettings.homepagePromos = homepagePromos ?? mockSettings.homepagePromos;
-      mockSettings.footerText = footerText ?? mockSettings.footerText;
-      mockSettings.contactEmail = contactEmail ?? mockSettings.contactEmail;
-      mockSettings.googleAnalyticsId = googleAnalyticsId ?? mockSettings.googleAnalyticsId;
-      mockSettings.updatedAt = new Date();
-      return NextResponse.json(mockSettings);
+      console.error("Database failed to update settings.", dbError);
+      return NextResponse.json(
+        { error: "Failed to save settings to the database" },
+        { status: 500 }
+      );
     }
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
